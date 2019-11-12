@@ -1,0 +1,22 @@
+version: '3.1'
+
+services:
+
+  mydb:
+    image: postgres:12
+    environment:
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - testdb1:/var/lib/postgresql/data
+      - ./dbscripts/:/docker-entrypoint-initdb.d
+
+  frontend:
+    #build: .
+    image: web:v6
+    environment:
+      DBHOST: mydb
+    ports:
+      - 8080:80
+    
+volumes: 
+  testdb1:
