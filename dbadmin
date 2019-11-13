@@ -1,0 +1,46 @@
+#!/bin/bash
+cat << HEADER
+Content-Type: text/html
+Server: httpd
+X-Set-Cookie: debug=1; Path=/
+
+HEADER
+is_set() {
+  env ${HTTP_COOKIE//;/} bash -c "[[ \$$1 ${2+ == $2} ]]" \
+  || env ${QUERY_STRING//&/ } bash -c "[[ \$$1 ${2+ == $2} ]]"
+}
+get_query() {
+  env ${QUERY_STRING//&/ } bash -c "echo \$$1"
+}
+is_set trace && set -x
+
+echo '<a href="?">refresh</a> <a href='/'>Home</a>'
+export PGPASSWORD=secret
+export PGHOST=mydb
+
+cat <<EOF
+<form method='get'> 
+  <input name='name'/> <input type='submit' name='action' value='add'>
+</form>
+EOF
+
+if is_set action delete; then
+  name=$(get_query name)
+  psql -t  -U postgres  postgres -c  "DELETE FROM person WHERE name='$name';"
+fi
+if is_set action add; then
+  name=$(get_query name)
+  psql -t  -U postgres  postgres -c  "INSERT INTO person VALUES ( '$name' );"
+fi
+
+people=$(psql -t  -U postgres  postgres -c  "SELECT * FROM person;")
+for name in ${people}; do
+  cat <<RECORD
+<li> $name <a href="?action=delete&name=$name">X</a>
+RECORD
+done
+
+if is_set debug; then
+  echo "<pre>"
+  printenv | grep 'HTTP_\|REQUEST\|QUERY'
+fi
