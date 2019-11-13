@@ -1,7 +1,12 @@
 FROM alpine
 RUN apk add -U curl  postgresql-client busybox-extras bash
-RUN mkdir /cgi-bin
-COPY ./db /cgi-bin/db
-RUN chmod +x /cgi-bin/db
-ENV DBHOST=""
-CMD httpd -f -h /
+
+COPY index.html /www/
+COPY db /www/cgi-bin/
+RUN chmod +x /www/cgi-bin/*
+
+ENV PGUSER=postgres
+ENV PGPASSWORD=secret
+ENV PGHOST=mydb
+
+CMD httpd -f -h /www

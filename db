@@ -1,8 +1,6 @@
 #!/bin/bash
-
 echo 'Content-Type: text/html;'
 echo 
 
-echo '<pre>'
-echo 'select * from person;' | PGPASSWORD=secret psql -h ${DBHOST:=172.17.0.9} -p 5432 -U postgres  postgres -w 
-echo '</pre>'
+echo "<a href='/'>Home</a>"
+psql --html -c 'select * from person;'
