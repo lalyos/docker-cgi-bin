@@ -1,5 +1,4 @@
 version: '3.1'
-
 services:
 
   mydb:
@@ -11,12 +10,20 @@ services:
       - ./dbscripts/:/docker-entrypoint-initdb.d
 
   frontend:
-    #build: .
+    build: .
     image: web:v6
     environment:
       DBHOST: mydb
     ports:
       - 8080:80
+
+  adminer:
+    image: adminer
+    restart: always
+    environment: 
+      - ADMINER_DEFAULT_SERVER=mydb
+    ports:
+      - 8081:8080
     
 volumes: 
   testdb1:
