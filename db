@@ -1,6 +1,9 @@
 #!/bin/bash
+[[ "$TRACE" ]] && set -x
 echo 'Content-Type: text/html;'
 echo 
 
 echo "<a href='/'>Home</a>"
 psql --html -c 'select * from person;'
+
+[[ "$DEBUG" ]] && echo '<pre>' ; printenv | grep 'HTTP_\|REQUEST\|QUERY'
